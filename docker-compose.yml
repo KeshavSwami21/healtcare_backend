@@ -1,0 +1,33 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: healthcare_db
+      POSTGRES_USER: healthcare_user
+      POSTGRES_PASSWORD: 123456789
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  web:
+    build: .
+    command: gunicorn healthcare.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - DEBUG=1
+      - DB_NAME=healthcare_db
+      - DB_USER=healthcare_user
+      - DB_PASSWORD=123456789
+      - DB_HOST=db
+      - DB_PORT=5432
+      - SECRET_KEY= 'django-insecure-t(urq&cf9*txc_*e95e)hxr@_s2u7d!+_imoch$!&wnactkp45'
+volumes:
+  postgres_data:
